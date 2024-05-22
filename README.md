@@ -1,0 +1,30 @@
+# Project overview
+Prototype to understand how slack models work for collecting form data. 
+
+### Dev setup
+Using python virtual environments:
+- python3 -m venv env (create a virtual environment)
+- source env/bin/activate (use the virtual environment)
+
+You'll want to use a slack sandbox environment, which can be access via https://api.slack.com/developer-program 
+
+Update the slack bot's [request url](https://api.slack.com/apps/A074RSJEQA0/interactive-messages) match the url from 
+ngrok
+
+Copy the bot's [user OAuth token](https://api.slack.com/apps/A074RSJEQA0/oauth) to the .env 
+file `SLACK_BOT_USER_OAUTH_TOKEN`
+
+Start the backend:
+```shell
+python3 main.py
+```
+
+Start ngrok so slack can talk to us 
+```shell
+ngrok http http://127.0.0.1:5000/slack
+```
+
+### ProtoType
+1. We take the input from a Slack form submission
+2. Check if we support solving this problem
+3. Apply rules which ask more question or give an answer
