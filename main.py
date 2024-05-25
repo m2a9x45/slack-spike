@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from slack.view_submission import view_submission
 from slack.shortcut import shortcut
 from slack.events import handle_event
+from slack.block_actions import block_actions
 
 load_dotenv()
 
@@ -42,7 +43,7 @@ def handle_slack():
             shortcut(data)
             return "", 200
         case "block_actions":
-            shortcut(data)
+            block_actions(data)
             return "", 200
 
     return "", 200

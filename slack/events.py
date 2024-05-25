@@ -62,10 +62,28 @@ def handle_event(data):
                         "type": "button",
                         "text": {
                             "type": "plain_text",
-                            "text": "Click Me"
+                            "text": "Connected Accounts"
                         },
-                        "value": "click_me_button",
-                        "action_id": "button_click"
+                        "value": "button_tap_connected_accounts",
+                        "action_id": "button_click_connected_accounts"
+                    },
+                    {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Easy Bank Transfer"
+                        },
+                        "value": "button_tap_easy_bank_transfer",
+                        "action_id": "button_click_easy_bank_transfer"
+                    },
+                    {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Something else"
+                        },
+                        "value": "button_tap_something_else",
+                        "action_id": "button_click_something_else"
                     }
                 ]
             }
