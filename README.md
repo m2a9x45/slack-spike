@@ -8,9 +8,6 @@ Using python virtual environments:
 
 You'll want to use a slack sandbox environment, which can be access via https://api.slack.com/developer-program 
 
-Update the slack bot's [request url](https://api.slack.com/apps/A074RSJEQA0/interactive-messages) match the url from 
-ngrok
-
 Copy the bot's [user OAuth token](https://api.slack.com/apps/A074RSJEQA0/oauth) to the .env 
 file `SLACK_BOT_USER_OAUTH_TOKEN`
 
@@ -21,7 +18,14 @@ python3 main.py
 
 Start ngrok so slack can talk to us 
 ```shell
-ngrok http http://127.0.0.1:5000/slack
+ngrok http http://127.0.0.1:5000
+```
+
+Update the slack bot's [request url](https://api.slack.com/apps/A074RSJEQA0/interactive-messages) match the url from 
+ngrok
+
+```shell
+https://{uuid}.ngrok-free.app/slack
 ```
 
 ### ProtoType
