@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from slack.view_submission import view_submission
 from slack.shortcut import shortcut
+from slack.events import handle_event
 
 load_dotenv()
 
@@ -14,6 +15,13 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     return "Hello, Flask!"
+
+
+@app.route('/events', methods=['POST'])
+def events():
+    data = request.json
+    handle_event(data)
+    return "", 200
 
 
 # Guide on what payload shortcut payload look like:
@@ -33,6 +41,11 @@ def handle_slack():
         case 'shortcut':
             shortcut(data)
             return "", 200
+        case "block_actions":
+            shortcut(data)
+            return "", 200
+
+    return "", 200
 
 
 if __name__ == '__main__':
