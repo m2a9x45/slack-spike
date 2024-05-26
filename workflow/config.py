@@ -6,19 +6,23 @@ class Config:
 
 def get_config(action_id):
     actions = {
+        # When this action_id is provided return three buttons
         "button_click_unique_1": {
-            "button_click_unique_4": "Consent approval screen not showing account",
-            "button_click_unique_5": "Consent approval screen not showing account",
-            "button_click_unique_6": "Consent approval screen not showing account",
+            "button_click_unique_4": "Button 1",
+            "button_click_unique_5": "Button 2",
+            "button_click_unique_6": "Button 3",
         },
+        # When this action_id is provided return a button that opens a model
         "button_click_unique_2": {
             "button_click_unique_5": "Something something easy transfer",
             "type": "modal"
         },
+        # When this action_id is provided return text with no button
         "button_click_unique_3": {
             "text": "Connected mortgages are owned by a different team",
             "type": "text"
         },
+        # When this action_id is provided return one buttons
         "button_click_unique_4": {
             "button_click_unique_7": "Something else thing"
         }

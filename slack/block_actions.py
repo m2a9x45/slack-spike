@@ -2,8 +2,7 @@ from slack.api import slack_api
 from workflow.config import get_config
 
 
-# TODO: Update the message that the block action is coming from to disable the button
-# Can maybe use the `chat.update` API?
+# TODO: Update the message that the block action is coming from to disable the button, using the `chat.update` API?
 def block_actions(data):
     if "actions" not in data:
         return
