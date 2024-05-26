@@ -28,11 +28,41 @@ def handle_event(data):
     if "thread_ts" in event:
         return "", 200
 
+    # TODO: Based on the channelID / message, we want to return the correct workflow
+    options = [
+        {
+            "text": "Consent approval screen not showing account",
+            "action_id": "button_click_unique_1"
+        },
+        {
+            "text": "Something something easy transfer",
+            "action_id": "button_click_unique_2"
+        },
+        {
+            "text": "Connected mortgages",
+            "action_id": "button_click_unique_3"
+        },
+        {
+            "text": "Something else thing",
+            "action_id": "button_click_unique_4"
+        }
+    ]
+
+    elements = []
+    for option in options:
+        elements.append({
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": option["text"],
+            },
+            "value": option["action_id"],
+            "action_id": option["action_id"]
+        })
+
     # Assume we're dealing with a new message & post a threaded reply
     event_ts = event["event_ts"]
     channel = event["channel"]
-
-    # TODO: Based on the channelID, we want to customize the message
 
     slack_oauth_token = os.getenv('SLACK_BOT_USER_OAUTH_TOKEN')
     bearer_token = "Bearer " + slack_oauth_token
@@ -57,35 +87,7 @@ def handle_event(data):
             },
             {
                 "type": "actions",
-                "elements": [
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Connected Accounts"
-                        },
-                        "value": "button_tap_connected_accounts",
-                        "action_id": "button_click_connected_accounts"
-                    },
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Easy Bank Transfer"
-                        },
-                        "value": "button_tap_easy_bank_transfer",
-                        "action_id": "button_click_easy_bank_transfer"
-                    },
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Something else"
-                        },
-                        "value": "button_tap_something_else",
-                        "action_id": "button_click_something_else"
-                    }
-                ]
+                "elements": elements
             }
         ]
     }

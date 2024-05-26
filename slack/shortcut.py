@@ -2,22 +2,12 @@ import os
 import requests
 import json
 
+from slack.api import slack_api
+
 
 def shortcut(data):
-    slack_oauth_token = os.getenv('SLACK_BOT_USER_OAUTH_TOKEN')
-    bearer_token = "Bearer " + slack_oauth_token
-
-    # Define the URL and headers
-    url = 'https://slack.com/api/views.open'
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': bearer_token
-    }
-
     trigger_id = data["trigger_id"]
-    print("Trigger ID:", trigger_id)
-
-    payload = {
+    slack_api('https://slack.com/api/views.open', {
         "trigger_id": trigger_id,
         "view": {
             "type": "modal",
@@ -47,8 +37,4 @@ def shortcut(data):
                 }
             ]
         }
-    }
-
-    response = requests.post(url, headers=headers, data=json.dumps(payload))
-    print(response.status_code)
-    print(response.json())
+    })
