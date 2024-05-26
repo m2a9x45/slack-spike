@@ -1,8 +1,5 @@
-import os
-import json
-import requests
-
 from slack.api import slack_api
+from workflow.config import get_config
 
 
 # TODO: Update the message that the block action is coming from to disable the button
@@ -12,40 +9,14 @@ def block_actions(data):
         return
 
     action_id = data["actions"][0]["action_id"]
-
-    # TODO: Check what we want to do with the block action, i.e. what's the next step in the workflow
-    messages = {
-        "button_click_unique_1": {
-            "button_click_unique_4": "Consent approval screen not showing account",
-            "button_click_unique_5": "Consent approval screen not showing account",
-            "button_click_unique_6": "Consent approval screen not showing account",
-        },
-        "button_click_unique_2": {
-            "button_click_unique_5": "Something something easy transfer",
-            "type": "modal"
-        },
-        "button_click_unique_3": {
-            "text": "Connected mortgages are owned by a different team",
-            "type": "text"
-        },
-        "button_click_unique_4": {
-            "button_click_unique_7": "Something else thing"
-        }
-    }
-
-    if action_id not in messages:
-        print("Unsupported action_id:", action_id)
-        return
-
     thread_ts = data["container"]["thread_ts"]
     channel = data["container"]["channel_id"]
 
-    reply_type = ""
-    for key, value in messages[action_id].items():
-        if key == "type":
-            reply_type = value
+    config = get_config(action_id=action_id)
+    if config is None:
+        return
 
-    match reply_type:
+    match config.outcome_type:
         case "text":
             slack_api('https://slack.com/api/chat.postMessage', {
                 "channel": channel,
@@ -55,7 +26,7 @@ def block_actions(data):
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": messages[action_id]["text"]
+                            "text": config.outcomes[0]
                         }
                     }
                 ]
@@ -96,18 +67,6 @@ def block_actions(data):
             })
             return
         case _:
-            elements = []
-            for key, value in messages[action_id].items():
-                elements.append({
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": value,
-                    },
-                    "value": "button_tap_connected_accounts",
-                    "action_id": key
-                })
-
             slack_api('https://slack.com/api/chat.postMessage', {
                 "channel": channel,
                 "thread_ts": thread_ts,
@@ -121,7 +80,7 @@ def block_actions(data):
                     },
                     {
                         "type": "actions",
-                        "elements": elements
+                        "elements": config.outcomes
                     }
                 ]
             })

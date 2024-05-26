@@ -2,6 +2,9 @@ import os
 import requests
 import json
 
+from slack.api import slack_api
+from workflow.config import get_options
+
 
 def handle_event(data):
     if "challenge" in data:
@@ -13,6 +16,8 @@ def handle_event(data):
                 return "", 200
 
     event = data["event"]
+    event_ts = event["event_ts"]
+    channel = event["channel"]
 
     # Don't respond to the bot's own messages, otherwise recursion
     if "bot_id" in event:
@@ -28,53 +33,9 @@ def handle_event(data):
     if "thread_ts" in event:
         return "", 200
 
-    # TODO: Based on the channelID / message, we want to return the correct workflow
-    options = [
-        {
-            "text": "Consent approval screen not showing account",
-            "action_id": "button_click_unique_1"
-        },
-        {
-            "text": "Something something easy transfer",
-            "action_id": "button_click_unique_2"
-        },
-        {
-            "text": "Connected mortgages",
-            "action_id": "button_click_unique_3"
-        },
-        {
-            "text": "Something else thing",
-            "action_id": "button_click_unique_4"
-        }
-    ]
-
-    elements = []
-    for option in options:
-        elements.append({
-            "type": "button",
-            "text": {
-                "type": "plain_text",
-                "text": option["text"],
-            },
-            "value": option["action_id"],
-            "action_id": option["action_id"]
-        })
-
     # Assume we're dealing with a new message & post a threaded reply
-    event_ts = event["event_ts"]
-    channel = event["channel"]
-
-    slack_oauth_token = os.getenv('SLACK_BOT_USER_OAUTH_TOKEN')
-    bearer_token = "Bearer " + slack_oauth_token
-
-    # Define the URL and headers
-    url = 'https://slack.com/api/chat.postMessage'
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': bearer_token
-    }
-
-    payload = {
+    elements = get_options()
+    slack_api('https://slack.com/api/chat.postMessage', {
         "channel": channel,
         "thread_ts": event_ts,
         "blocks": [
@@ -90,10 +51,6 @@ def handle_event(data):
                 "elements": elements
             }
         ]
-    }
-
-    response = requests.post(url, headers=headers, data=json.dumps(payload))
-    print(response.status_code)
-    print(response.json())
+    })
 
     return "", 200
