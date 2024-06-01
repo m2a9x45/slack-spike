@@ -7,6 +7,7 @@ class Config:
 workflows = [
     {
         "id": "connected-accounts",
+        "trigger_id": "open_banking_escalations_C074P84H15Y",
         "steps": [
             {
                 "step_id": 1,
@@ -56,6 +57,34 @@ workflows = [
                 "step_id": 4,
                 "action": "open_modal",
             },
+        ]
+    },
+    {
+        "id": "easy-transfers",
+        "trigger_id": "test_workflow_C074P84H15Y",
+        "steps": [
+            {
+                "step_id": 1,
+                "action": "button_selection",
+                "message": "Step 1: Hello world",
+                "branch": [
+                    {
+                        "text": "yes",
+                        "action_id": "easy-transfers_button-click-1",
+                        "next_step": 2
+                    },
+                    {
+                        "text": "no",
+                        "action_id": "easy-transfers_button-click-2",
+                        "next_step": 3
+                    }
+                ]
+            },
+            {
+                "step_id": 2,
+                "action": "send_message",
+                "message": "Step 3: yes",
+            }
         ]
     }
 ]
@@ -122,4 +151,11 @@ def get_options(branches):
 def get_workflow(workflow_id):
     for workflow in workflows:
         if workflow["id"] == workflow_id:
+            return workflow
+
+
+def get_workflow_by_trigger_id(trigger_id):
+    print(trigger_id)
+    for workflow in workflows:
+        if workflow["trigger_id"] == trigger_id:
             return workflow

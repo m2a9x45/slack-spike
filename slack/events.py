@@ -33,7 +33,17 @@ def handle_event(data):
     if "thread_ts" in event:
         return "", 200
 
-    workflow = get_workflow("connected-accounts")
+    # Default workflow for channel, should be configurable
+    workflow = get_workflow('connected-accounts')
+
+    # Check if Slack workflow is a trigger for one of our workflows
+    if "username" in event:
+        trigger_id = event["username"].replace(" ", "_").lower() + "_" + event["channel"]
+        workflow = get_workflow_by_trigger_id(trigger_id)
+        if workflow is None:
+            print("No workflow found:", trigger_id)
+            return "", 200
+
     first_workflow_step = workflow["steps"][0]
 
     # Assume we're dealing with a new message & post a threaded reply
