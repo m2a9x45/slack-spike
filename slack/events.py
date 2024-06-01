@@ -3,7 +3,7 @@ import requests
 import json
 
 from slack.api import slack_api
-from workflow.config import get_options
+from workflow.config import *
 
 
 def handle_event(data):
@@ -33,8 +33,11 @@ def handle_event(data):
     if "thread_ts" in event:
         return "", 200
 
+    workflow = get_workflow("connected-accounts")
+    first_workflow_step = workflow["steps"][0]
+
     # Assume we're dealing with a new message & post a threaded reply
-    elements = get_options()
+    elements = get_options(first_workflow_step["branch"])
     slack_api('https://slack.com/api/chat.postMessage', {
         "channel": channel,
         "thread_ts": event_ts,
@@ -43,7 +46,7 @@ def handle_event(data):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "Here is a button:"
+                    "text": first_workflow_step["message"]
                 }
             },
             {

@@ -4,91 +4,122 @@ class Config:
         self.outcomes = outcomes
 
 
-def get_config(action_id):
-    actions = {
-        # When this action_id is provided return three buttons
-        "button_click_unique_1": {
-            "button_click_unique_4": "Button 1",
-            "button_click_unique_5": "Button 2",
-            "button_click_unique_6": "Button 3",
-        },
-        # When this action_id is provided return a button that opens a model
-        "button_click_unique_2": {
-            "button_click_unique_5": "Something something easy transfer",
-            "type": "modal"
-        },
-        # When this action_id is provided return text with no button
-        "button_click_unique_3": {
-            "text": "Connected mortgages are owned by a different team",
-            "type": "text"
-        },
-        # When this action_id is provided return one buttons
-        "button_click_unique_4": {
-            "button_click_unique_7": "Something else thing"
-        }
+workflows = [
+    {
+        "id": "connected-accounts",
+        "steps": [
+            {
+                "step_id": 1,
+                "action": "button_selection",
+                "message": "Step 1: What's the issue?",
+                "branch": [
+                    {
+                        "text": "Consent approval screen",
+                        "action_id": "connected-accounts_button-click-1",
+                        "next_step": 2
+                    },
+                    {
+                        "text": "Easy Transfer",
+                        "action_id": "connected-accounts_button-click-2",
+                        "next_step": 3
+                    }
+                ]
+            },
+            {
+                "step_id": 2,
+                "action": "button_selection",
+                "message": "Step 2: Choose consent approval option",
+                "branch": [
+                    {
+                        "text": "Button 1",
+                        "action_id": "connected-accounts_button-click-3",
+                        "next_step": 4
+                    },
+                    {
+                        "text": "Button 2",
+                        "action_id": "connected-accounts_button-click-4",
+                        "next_step": 5
+                    },
+                    {
+                        "text": "Button 3",
+                        "action_id": "connected-accounts_button-click-5",
+                        "next_step": 6
+                    }
+                ]
+            },
+            {
+                "step_id": 3,
+                "action": "send_message",
+                "message": "Step 3: Workflow finished",
+            },
+            {
+                "step_id": 4,
+                "action": "open_modal",
+            },
+        ]
     }
+]
 
-    if action_id not in actions:
-        print("Unsupported action_id:", action_id)
-        return
 
-    reply_type = ""
-    for key, value in actions[action_id].items():
-        if key == "type":
-            reply_type = value
+def get_next_step_by_action_id(workflow, action_id):
+    next_step = 0
+
+    for step in workflow['steps']:
+        if "branch" in step:
+            for branch in step['branch']:
+                if branch['action_id'] == action_id:
+                    next_step = branch["next_step"]
+                    break
+            if next_step != 0:
+                break
+
+    for step in workflow['steps']:
+        if step['step_id'] == next_step:
+            return step
+
+
+def get_config(next_step):
+    reply_type = next_step['action']
 
     outcomes = []
-    for key, value in actions[action_id].items():
-        match reply_type:
-            case "text":
-                outcomes.append(actions[action_id]["text"])
-            case "modal":
-                break
-            case _:
-                outcomes.append({
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": value,
-                    },
-                    "value": "button_tap_connected_accounts",
-                    "action_id": key
-                })
+    if reply_type == 'button_selection':
+        for branch in next_step["branch"]:
+            outcomes.append({
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": branch["text"],
+                },
+                "value": "button_tap_connected_accounts",
+                "action_id": branch["action_id"],
+            })
+
+    if reply_type == 'send_message':
+        outcomes.append(next_step["message"])
+
+    if reply_type == 'open_modal':
+        return Config(reply_type, outcomes)
 
     return Config(reply_type, outcomes)
 
 
-def get_options():
-    # TODO: Based on the channelID / message, we want to return the correct workflow
-    options = [
-        {
-            "text": "Consent approval screen not showing account",
-            "action_id": "button_click_unique_1"
-        },
-        {
-            "text": "Something something easy transfer",
-            "action_id": "button_click_unique_2"
-        },
-        {
-            "text": "Connected mortgages",
-            "action_id": "button_click_unique_3"
-        },
-        {
-            "text": "Something else thing",
-            "action_id": "button_click_unique_4"
-        }
-    ]
-
+def get_options(branches):
     elements = []
-    for option in options:
+    for branch in branches:
         elements.append({
             "type": "button",
             "text": {
                 "type": "plain_text",
-                "text": option["text"],
+                "text": branch["text"],
             },
-            "value": option["action_id"],
-            "action_id": option["action_id"]
+            "value": branch["action_id"],
+            "action_id": branch["action_id"]
         })
 
     return elements
+
+
+def get_workflow(workflow_id):
+    for workflow in workflows:
+        if workflow["id"] == workflow_id:
+            return workflow

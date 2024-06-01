@@ -1,5 +1,5 @@
 from slack.api import slack_api
-from workflow.config import get_config
+from workflow.config import *
 
 
 # TODO: Update the message that the block action is coming from to disable the button, using the `chat.update` API?
@@ -11,12 +11,18 @@ def block_actions(data):
     thread_ts = data["container"]["thread_ts"]
     channel = data["container"]["channel_id"]
 
-    config = get_config(action_id=action_id)
+    # Get the workflowID from the actionID
+    workflow_id = action_id.split("_")[0]
+    workflow = get_workflow(workflow_id)
+
+    next_step = get_next_step_by_action_id(workflow, action_id)
+
+    config = get_config(next_step)
     if config is None:
         return
 
     match config.outcome_type:
-        case "text":
+        case "send_message":
             slack_api('https://slack.com/api/chat.postMessage', {
                 "channel": channel,
                 "thread_ts": thread_ts,
@@ -31,7 +37,7 @@ def block_actions(data):
                 ]
             })
             return
-        case "modal":
+        case "open_modal":
             trigger_id = data["trigger_id"]
             slack_api('https://slack.com/api/views.open', {
                 "trigger_id": trigger_id,
