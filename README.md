@@ -21,8 +21,10 @@ Start ngrok so slack can talk to us
 ngrok http http://127.0.0.1:5000
 ```
 
-Update the slack bot's [request url](https://api.slack.com/apps/A074RSJEQA0/interactive-messages) match the url from 
+Update the slack bot's [request url](https://api.slack.com/apps/A074RSJEQA0/interactive-messages) to match the url from 
 ngrok
+
+Update the slack bot's event subscriptions [request url](https://api.slack.com/apps/A074RSJEQA0/event-subscriptions) to match the url from ngrok
 
 ```shell
 https://{uuid}.ngrok-free.app/slack

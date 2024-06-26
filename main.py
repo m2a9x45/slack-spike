@@ -21,8 +21,7 @@ def home():
 @app.route('/events', methods=['POST'])
 def events():
     data = request.json
-    handle_event(data)
-    return "", 200
+    return handle_event(data)
 
 
 # Guide on what payload shortcut payload look like:
