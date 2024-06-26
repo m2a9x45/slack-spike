@@ -86,6 +86,51 @@ workflows = [
                 "message": "Step 3: yes",
             }
         ]
+    },
+    {
+        "id": "test-1",
+        "trigger_id": "testing_thing_C074P84H15Y",
+        "steps": [
+            {
+                "step_id": 1,
+                "action": "button_selection",
+                "message": "Select a provider",
+                "branch": [
+                    {
+                        "text": "yes",
+                        "action_id": "test-1_button-click-1",
+                        "next_step": 2
+                    }
+                ]
+            },
+            {
+                "step_id": 2,
+                "action": "open_modal",
+                "input": [
+                    {
+                        "options": [
+                            {"name": "HSBC", "value": "hsbc"},
+                            {"name": "Lloyds", "value": "lloyds"},
+                            {"name": "TSB", "value": "tsb"},
+                        ]
+                    }
+                ],
+                "message": "test",
+                "branch": [
+                    {
+                        "text": "Consent approval screen",
+                        "action_id": "test-1_button-click-2",
+                        "next_step": 4
+                    },
+                    {
+                        "text": "Easy Transfer",
+                        "action_id": "test-1_button-click-3",
+                        "next_step": 5
+                    }
+                ]
+            },
+
+        ]
     }
 ]
 
@@ -127,7 +172,45 @@ def get_config(next_step):
         outcomes.append(next_step["message"])
 
     if reply_type == 'open_modal':
-        return Config(reply_type, outcomes)
+        if "input" not in next_step:
+            return Config(reply_type, [{
+                "type": "input",
+                "element": {
+                    "type": "plain_text_input",
+                    "action_id": "plain_text_input-action"
+                },
+                "label": {
+                    "type": "plain_text",
+                    "text": "Thing",
+                }
+            }])
+
+        options = []
+        for option in next_step["input"][0]["options"]:
+            options.append({
+                "text": {
+                    "type": "plain_text",
+                    "text": option["name"],
+                },
+                "value": option["value"]
+            })
+
+        outcomes.append({
+            "type": "input",
+            "element": {
+                    "type": "static_select",
+                    "placeholder": {
+                            "type": "plain_text",
+                        "text": "Select an item",
+                    },
+                "options": options,
+                "action_id": "static_select-action"
+            },
+            "label": {
+                "type": "plain_text",
+                "text": "Label",
+            }
+        })
 
     return Config(reply_type, outcomes)
 

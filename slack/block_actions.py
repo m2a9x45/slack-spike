@@ -55,19 +55,7 @@ def block_actions(data):
                         "type": "plain_text",
                         "text": "Cancel",
                     },
-                    "blocks": [
-                        {
-                            "type": "input",
-                            "element": {
-                                "type": "plain_text_input",
-                                "action_id": "plain_text_input-action"
-                            },
-                            "label": {
-                                "type": "plain_text",
-                                "text": "Thing",
-                            }
-                        }
-                    ]
+                    "blocks": config.outcomes
                 }
             })
             return
