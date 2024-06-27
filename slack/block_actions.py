@@ -1,5 +1,5 @@
-from slack.api import slack_api
-from workflow.config import *
+from slack.api import *
+from workflow import config, store
 
 
 # TODO: Update the message that the block action is coming from to disable the button, using the `chat.update` API?
@@ -13,67 +13,30 @@ def block_actions(data):
 
     # Get the workflowID from the actionID
     workflow_id = action_id.split("_")[0]
-    workflow = get_workflow(workflow_id)
+    workflow = config.get_workflow(workflow_id)
 
-    next_step = get_next_step_by_action_id(workflow, action_id)
+    next_step = config.get_next_step_by_action_id(workflow, action_id)
 
-    config = get_config(next_step)
-    if config is None:
+    workflow_config = config.get_config(next_step)
+    if workflow_config is None:
         return
 
-    match config.outcome_type:
+    match workflow_config.outcome_type:
         case "send_message":
-            slack_api('https://slack.com/api/chat.postMessage', {
-                "channel": channel,
-                "thread_ts": thread_ts,
-                "blocks": [
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": config.outcomes[0]
-                        }
-                    }
-                ]
-            })
+            slack_send_message(
+                channel=channel, thread_ts=thread_ts, text=workflow_config.outcomes[0])
             return
         case "open_modal":
+            # TODO: If any workflow has mutiple model steps, we'll want to update the callback object store with the new data
+            model_close_next_step = next_step["branch"][0]["next_step"]
+
+            id = store.add_callback(
+                workflow_id=workflow_id, channel=channel, thread_ts=thread_ts, next_step=model_close_next_step)
             trigger_id = data["trigger_id"]
-            slack_api('https://slack.com/api/views.open', {
-                "trigger_id": trigger_id,
-                "view": {
-                    "type": "modal",
-                    "title": {
-                        "type": "plain_text",
-                        "text": "My App",
-                    },
-                    "submit": {
-                        "type": "plain_text",
-                        "text": "Submit",
-                    },
-                    "close": {
-                        "type": "plain_text",
-                        "text": "Cancel",
-                    },
-                    "blocks": config.outcomes
-                }
-            })
+            slack_open_model(trigger_id=trigger_id,
+                             blocks=workflow_config.outcomes, callback_id=id)
             return
         case _:
-            slack_api('https://slack.com/api/chat.postMessage', {
-                "channel": channel,
-                "thread_ts": thread_ts,
-                "blocks": [
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "Here is a button:"
-                        }
-                    },
-                    {
-                        "type": "actions",
-                        "elements": config.outcomes
-                    }
-                ]
-            })
+            slack_fallback_message(
+                channel=channel, thread_ts=thread_ts, elements=workflow_config.outcomes)
+            return

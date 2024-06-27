@@ -1,6 +1,5 @@
-import os
-import requests
-import json
+from slack.api import *
+from workflow import config, store
 
 
 # Handles model submissions, currently only supports the text input felid
@@ -9,8 +8,47 @@ def view_submission(data):
     blocks = data["view"]["blocks"]
     state = data["view"]["state"]["values"]
 
-    # We want to pull out each block elements type, so we can read it's state
+    # We'll want to store form_values at some point
+    # This is the data the customer entered into the model who's submission is being handled
+    form_values = get_state(blocks=blocks, state=state)
+    print(form_values)
 
+    callback_id = data["view"]["callback_id"]
+    callback_date = store.get_store(callback_id)
+
+    workflow_id = callback_date["workflow_id"]
+    channel = callback_date["channel"]
+    thread_ts = callback_date["thread"]
+    next_step = callback_date["next_step"]
+
+    workflow = config.get_workflow(workflow_id)
+    workflow_next_step = config.get_step_by_id(
+        workflow=workflow, step_id=next_step)
+    workflow_config = config.get_config(workflow_next_step)
+
+    match workflow_config.outcome_type:
+        case "send_message":
+            slack_send_message(
+                channel=channel, thread_ts=thread_ts, text=workflow_config.outcomes[0] + " " + list(form_values.values())[0])
+            return
+        case "open_modal":
+            # TODO: If any workflow has mutiple model steps, we'll want to update the callback object store with the new data
+            model_close_next_step = next_step["branch"][0]["next_step"]
+
+            id = store.add_callback(
+                workflow_id=workflow_id, channel=channel, thread_ts=thread_ts, next_step=model_close_next_step)
+            trigger_id = data["trigger_id"]
+            slack_open_model(trigger_id=trigger_id,
+                             blocks=workflow_config.outcomes, callback_id=id)
+            return
+        case _:
+            slack_fallback_message(
+                channel=channel, thread_ts=thread_ts, elements=workflow_config.outcomes)
+            return
+
+
+# Will extract the users selected responses from the model
+def get_state(blocks, state):
     info_by_block_id = {}
     for block in blocks:
         block_id = block["block_id"]
@@ -37,26 +75,4 @@ def view_submission(data):
             state_access_path = state[block_id][action_id]["value"]
 
         form_values[block_id + "_" + label] = state_access_path
-
-    slack_oauth_token = os.getenv('SLACK_BOT_USER_OAUTH_TOKEN')
-    bearer_token = "Bearer " + slack_oauth_token
-
-    # Define the URL and headers
-    url = 'https://slack.com/api/chat.postMessage'
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': bearer_token
-    }
-
-    print(form_values)
-
-    payload = {
-        "channel": "C074P84H15Y",
-        "text": "Hello world :tada: " + list(form_values.values())[0]
-    }
-
-    response = requests.post(url, headers=headers, data=json.dumps(payload))
-    print(response.status_code)
-    print(response.json())
-
     return form_values

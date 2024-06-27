@@ -14,3 +14,62 @@ def slack_api(url, payload):
 
     response = requests.post(url, headers=headers, data=json.dumps(payload))
     print("Slack API:", response.status_code, response.json())
+
+
+def slack_send_message(channel, thread_ts, text):
+    slack_api('https://slack.com/api/chat.postMessage', {
+        "channel": channel,
+        "thread_ts": thread_ts,
+        "blocks": [
+            {
+                "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": text
+                        }
+            }
+        ]
+    })
+
+
+def slack_open_model(trigger_id, blocks, callback_id):
+    slack_api('https://slack.com/api/views.open', {
+        "trigger_id": trigger_id,
+        "view": {
+            "type": "modal",
+                    "title": {
+                        "type": "plain_text",
+                        "text": "My App",
+                    },
+            "submit": {
+                        "type": "plain_text",
+                        "text": "Submit",
+                    },
+            "close": {
+                        "type": "plain_text",
+                        "text": "Cancel",
+                    },
+            "blocks": blocks,
+            "callback_id": callback_id
+        }
+    })
+
+
+def slack_fallback_message(channel, thread_ts, elements):
+    slack_api('https://slack.com/api/chat.postMessage', {
+        "channel": channel,
+        "thread_ts": thread_ts,
+        "blocks": [
+            {
+                "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "Here is a button:"
+                        }
+            },
+            {
+                "type": "actions",
+                        "elements": elements
+            }
+        ]
+    })

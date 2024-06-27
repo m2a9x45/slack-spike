@@ -1,7 +1,3 @@
-import os
-import requests
-import json
-
 from slack.api import slack_api
 from workflow.config import *
 
@@ -38,7 +34,8 @@ def handle_event(data):
 
     # Check if Slack workflow is a trigger for one of our workflows
     if "username" in event:
-        trigger_id = event["username"].replace(" ", "_").lower() + "_" + event["channel"]
+        trigger_id = event["username"].replace(
+            " ", "_").lower() + "_" + event["channel"]
         workflow = get_workflow_by_trigger_id(trigger_id)
         if workflow is None:
             print("No workflow found:", trigger_id)

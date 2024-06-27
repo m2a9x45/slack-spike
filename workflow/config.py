@@ -39,12 +39,12 @@ workflows = [
                     {
                         "text": "Button 2",
                         "action_id": "connected-accounts_button-click-4",
-                        "next_step": 5
+                        "next_step": 3
                     },
                     {
                         "text": "Button 3",
                         "action_id": "connected-accounts_button-click-5",
-                        "next_step": 6
+                        "next_step": 3
                     }
                 ]
             },
@@ -56,6 +56,11 @@ workflows = [
             {
                 "step_id": 4,
                 "action": "open_modal",
+                "branch": [
+                    {
+                        "next_step": 3
+                    },
+                ]
             },
         ]
     },
@@ -83,7 +88,12 @@ workflows = [
             {
                 "step_id": 2,
                 "action": "send_message",
-                "message": "Step 3: yes",
+                "message": "Step 2: yes",
+            },
+            {
+                "step_id": 3,
+                "action": "send_message",
+                "message": "Step 3: no",
             }
         ]
     },
@@ -118,18 +128,15 @@ workflows = [
                 "message": "test",
                 "branch": [
                     {
-                        "text": "Consent approval screen",
-                        "action_id": "test-1_button-click-2",
                         "next_step": 4
                     },
-                    {
-                        "text": "Easy Transfer",
-                        "action_id": "test-1_button-click-3",
-                        "next_step": 5
-                    }
                 ]
             },
-
+            {
+                "step_id": 4,
+                "action": "send_message",
+                "message": "Step 4: Workflow finished",
+            },
         ]
     }
 ]
@@ -149,6 +156,12 @@ def get_next_step_by_action_id(workflow, action_id):
 
     for step in workflow['steps']:
         if step['step_id'] == next_step:
+            return step
+
+
+def get_step_by_id(workflow, step_id):
+    for step in workflow['steps']:
+        if step["step_id"] == step_id:
             return step
 
 
