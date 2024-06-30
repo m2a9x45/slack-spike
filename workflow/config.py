@@ -132,11 +132,19 @@ workflows = [
                     },
                 ]
             },
+            # {
+            #     "step_id": 4,
+            #     "action": "conditional",
+            #     "outcomes": {
+            #         {"next_step": 5, "values": ["hsbc", "lloyds"]},
+            #         {"next_step": 5, "values": ["tsb"]},
+            #     }
+            # },
             {
-                "step_id": 4,
+                "step_id": 5,
                 "action": "send_message",
                 "message": "Step 4: Workflow finished",
-            },
+            }
         ]
     }
 ]

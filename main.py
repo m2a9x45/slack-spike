@@ -1,6 +1,7 @@
 import json
 
 from flask import Flask, request
+from flask_cors import CORS
 from dotenv import load_dotenv
 
 from slack.view_submission import view_submission
@@ -8,14 +9,25 @@ from slack.shortcut import shortcut
 from slack.events import handle_event
 from slack.block_actions import block_actions
 
+from routes.commands import *
+
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/')
 def home():
     return "Hello, Flask!"
+
+
+@app.route('/slash', methods=['POST'])
+def slash():
+    data = request.json
+    print(data)
+    set_command(data)
+    return {"message": "success"}, 200
 
 
 @app.route('/events', methods=['POST'])

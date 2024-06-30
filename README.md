@@ -1,7 +1,17 @@
 # Project overview
 Prototype to understand how slack models work for collecting form data. 
 
-### Dev setup
+## Dev setup
+
+### Database
+You'll want to connect to a mysql database and then run the migration file & seed files
+
+- `mysql -h 127.0.0.1 -P 4000 -u root -p`
+- `source \slack-spike\config\2024-06-30_migration.sql`
+- `source \slack-spike\config\seed\commands.sql`
+
+### Backend
+
 Using python virtual environments:
 - `python3 -m venv env` (create a virtual environment)
 - On Mac & Linus: `source env/bin/activate` (use the virtual environment)
