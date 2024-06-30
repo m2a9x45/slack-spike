@@ -1,7 +1,3 @@
-import os
-import requests
-import json
-
 from slack.api import slack_api
 
 

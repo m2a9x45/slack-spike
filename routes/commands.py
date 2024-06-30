@@ -1,14 +1,15 @@
-from dao import db
+from flask import request
+from dao import commands
 
 
-def set_command(data):
-    con = db.get_connection()
-    cursor = con.cursor()
+def set_command():
+    data = request.json
 
-    sql = "INSERT INTO commands (path_id, command, workflow_id) VALUES (%s, %s, %s)"
-    val = (data["path_id"], data["command"], data["workflow_id"])
-    cursor.execute(sql, val)
+    commands.create(
+        path_id=data["path_id"], command=data["command"], worflow_id=data["workflow_id"])
 
-    con.commit()
+    return {"message": "success"}, 200
 
-    print(cursor.rowcount, "record inserted.")
+
+def list_commands():
+    return commands.get_all()

@@ -56,9 +56,8 @@ def slack_open_model(trigger_id, blocks, callback_id):
 
 
 def slack_fallback_message(channel, thread_ts, elements):
-    slack_api('https://slack.com/api/chat.postMessage', {
+    data = {
         "channel": channel,
-        "thread_ts": thread_ts,
         "blocks": [
             {
                 "type": "section",
@@ -72,4 +71,9 @@ def slack_fallback_message(channel, thread_ts, elements):
                         "elements": elements
             }
         ]
-    })
+    }
+
+    if thread_ts is not None:
+        data["thread_ts"] = thread_ts
+
+    slack_api('https://slack.com/api/chat.postMessage', data)

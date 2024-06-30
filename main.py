@@ -8,6 +8,7 @@ from slack.view_submission import view_submission
 from slack.shortcut import shortcut
 from slack.events import handle_event
 from slack.block_actions import block_actions
+from slack.slash_command import handle_slash_command
 
 from routes.commands import *
 
@@ -22,18 +23,28 @@ def home():
     return "Hello, Flask!"
 
 
+@app.route('/slash', methods=['GET'])
+def slash_list():
+    return list_commands()
+
+
 @app.route('/slash', methods=['POST'])
 def slash():
-    data = request.json
-    print(data)
-    set_command(data)
-    return {"message": "success"}, 200
+    return set_command()
 
 
 @app.route('/events', methods=['POST'])
 def events():
     data = request.json
     return handle_event(data)
+
+
+# https://api.slack.com/interactivity/slash-commands
+@app.route('/slack-command', methods=['POST'])
+def command():
+    data = request.form
+    handle_slash_command(data)
+    return "", 200
 
 
 # Guide on what payload shortcut payload look like:

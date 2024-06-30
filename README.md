@@ -35,13 +35,25 @@ Start ngrok so slack can talk to us
 ngrok http http://127.0.0.1:5000
 ```
 
+### Slack setup
+
 Update the slack bot's interactivity & shortcut's [request url](https://api.slack.com/apps/A074RSJEQA0/interactive-messages) to match the url from 
 ngrok
+
+```shell
+https://{uuid}.ngrok-free.app/slack
+```
 
 Update the slack bot's event subscription's [request url](https://api.slack.com/apps/A074RSJEQA0/event-subscriptions) to match the url from ngrok
 
 ```shell
-https://{uuid}.ngrok-free.app/slack
+https://{uuid}.ngrok-free.app/events
+```
+
+Add a [new slash command](https://api.slack.com/apps/A074RSJEQA0/slash-commands) to the bot; with a command of `/esc` & a request url matching ngrok
+
+```shell
+https://{uuid}.ngrok-free.app/slack-command
 ```
 
 ### ProtoType
