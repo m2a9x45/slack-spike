@@ -35,7 +35,24 @@ Start ngrok so slack can talk to us
 ngrok http http://127.0.0.1:5000
 ```
 
+Ngrok allows starting mutiple tunnels within a single agent session:
+```shell
+ngrok start --all
+```
+
+```yaml
+tunnels:
+  httpbin:
+    proto: http
+    addr: 5000
+  demo:
+    proto: http
+    addr: 5173
+```
+
 ### Slack setup
+
+// TODO: Add steps for setting a oauth redirect url, to support sign-in with Slack
 
 Update the slack bot's interactivity & shortcut's [request url](https://api.slack.com/apps/A074RSJEQA0/interactive-messages) to match the url from 
 ngrok

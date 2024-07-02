@@ -11,6 +11,7 @@ from slack.block_actions import block_actions
 from slack.slash_command import handle_slash_command
 
 from routes.commands import *
+from routes.oauth_slack import *
 
 load_dotenv()
 
@@ -21,6 +22,11 @@ CORS(app)
 @app.route('/')
 def home():
     return "Hello, Flask!"
+
+
+@app.route('/oauth/slack', methods=['POST'])
+def slack_oauth():
+    return handle_oauth_slack()
 
 
 @app.route('/slash', methods=['GET'])
