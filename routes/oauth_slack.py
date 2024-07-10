@@ -1,7 +1,14 @@
 import os
 import requests
+import jwt
+
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
+import base64
 
 from flask import request
+from dao import users
 
 
 def handle_oauth_slack():
@@ -26,10 +33,61 @@ def handle_oauth_slack():
     response = requests.post(url, headers=headers, data=payload)
     print("Slack API:", response.status_code, response.json())
 
-    # Check if the response if successful
+    res_json = response.json()
 
-    # Check if the user already has an account
-    # If so log them in, return a cookie / session
-    # Else create a new user
+    # Parse & Verfiy JWT (https://slack.com/openid/connect/keys)
+    jwt_data = decode_jwt(data=res_json, client_id=client_id)
 
-    return "", 200
+    slack_user_id = jwt_data["https://slack.com/user_id"]
+    slack_team_id = jwt_data["https://slack.com/team_id"]
+    access_token = res_json["access_token"]
+    email = jwt_data["email"]
+    name = jwt_data["name"]
+    img_url = jwt_data["picture"]
+
+    # TODO: Check if the user already has an account
+
+    users.create(slack_user_id=slack_user_id, slack_team_id=slack_team_id,
+                 email=email, name=name, profile_img=img_url, access_token=access_token)
+
+    # TODO: Return a cookie with a session ID
+
+    return {"message": "success"}, 200
+
+
+def decode_jwt(data, client_id):
+    print(data)
+
+    req = requests.get('https://slack.com/openid/connect/keys')
+    jwks = req.json()
+    print(jwks)
+
+    # Extracting the first key (assuming only one key is present)
+    key = jwks['keys'][0]
+
+    # Base64 URL decode the exponent and modulus
+    e = int.from_bytes(base64.urlsafe_b64decode(key['e'] + '=='), 'big')
+    n = int.from_bytes(base64.urlsafe_b64decode(key['n'] + '=='), 'big')
+
+    # Create the RSA public key
+    public_key = rsa.RSAPublicNumbers(e, n).public_key(default_backend())
+
+    # Serialize the public key to PEM format
+    pem = public_key.public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+
+    # Print the PEM formatted public key
+    print(pem.decode('utf-8'))
+
+    # Decode the JWT
+    try:
+        decoded_jwt = jwt.decode(
+            data["id_token"], pem, algorithms=["RS256"], audience=client_id)
+        print(decoded_jwt)
+        return decoded_jwt
+    except jwt.ExpiredSignatureError:
+        print("Token has expired")
+    except jwt.InvalidTokenError:
+        print("Invalid token")
