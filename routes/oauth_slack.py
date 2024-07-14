@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 import base64
 
-from flask import request
+from flask import make_response, request, jsonify
 from dao import users
 
 
@@ -46,13 +46,22 @@ def handle_oauth_slack():
     img_url = jwt_data["picture"]
 
     # TODO: Check if the user already has an account
+    existing_user = users.find_by_slack_id(slack_user_id=slack_user_id)
+    if existing_user is not None:
+        res = make_response(jsonify({"sucesss": True}))
+        res.set_cookie("user_id", slack_user_id,
+                       httponly="true", samesite="none", secure="true")
+        # res.headers["Access-Control-Allow-Credentials"] = "true"
+        return res, 200
 
     users.create(slack_user_id=slack_user_id, slack_team_id=slack_team_id,
                  email=email, name=name, profile_img=img_url, access_token=access_token)
 
-    # TODO: Return a cookie with a session ID
-
-    return {"message": "success"}, 200
+    res = make_response(jsonify({"sucesss": True}))
+    res.set_cookie("user_id", slack_user_id, httponly="true",
+                   samesite="none", secure="true")
+    # res.headers["Access-Control-Allow-Credentials"] = "true"
+    return res, 200
 
 
 def decode_jwt(data, client_id):

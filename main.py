@@ -16,7 +16,8 @@ from routes.oauth_slack import *
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+cors = CORS(app, supports_credentials=True,
+            resources={r"/*": {"origins": ["https://7d7b-31-53-104-139.ngrok-free.app", "http://localhost:5173"]}})
 
 
 @app.route('/')
@@ -27,6 +28,13 @@ def home():
 @app.route('/oauth/slack', methods=['POST'])
 def slack_oauth():
     return handle_oauth_slack()
+
+
+@app.route('/whoami')
+def whoami():
+    user = request.cookies.get('user_id')
+    print(user)
+    return {"message": "success", "user": user}, 200
 
 
 @app.route('/slash', methods=['GET'])
