@@ -1,9 +1,11 @@
 from slack.api import *
 from workflow import config, store
-
+from dao import workflow
 
 # Handles model submissions, currently only supports the text input felid
 # https://api.slack.com/surfaces/modals#interactions
+
+
 def view_submission(data):
     blocks = data["view"]["blocks"]
     state = data["view"]["state"]["values"]
@@ -20,6 +22,13 @@ def view_submission(data):
     channel = callback_date["channel"]
     thread_ts = callback_date["thread"]
     next_step = callback_date["next_step"]
+
+    print(next_step)
+
+    if True:
+        view_submission_v2(workflow_id=workflow_id, step_id=next_step, channel=channel,
+                           thread_ts=thread_ts, form_values=form_values, trigger_id=data["trigger_id"])
+        return
 
     workflow = config.get_workflow(workflow_id)
     workflow_next_step = config.get_step_by_id(
@@ -76,3 +85,18 @@ def get_state(blocks, state):
 
         form_values[block_id + "_" + label] = state_access_path
     return form_values
+
+
+def view_submission_v2(workflow_id, step_id, channel, thread_ts, form_values, trigger_id):
+    next_step = workflow.get_step_by_id(
+        wf_id=workflow_id, step_id=step_id)
+
+    match next_step[0]["action"]:
+        case "send_message":
+            slack_send_message(
+                channel=channel, thread_ts=thread_ts, text=next_step[0]["message"] + " " + list(form_values.values())[0])
+            return
+        case _:
+            slack_fallback_message(
+                channel=channel, thread_ts=thread_ts, elements=[])
+            return

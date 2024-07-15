@@ -1,6 +1,7 @@
+from functools import wraps
 import json
 
-from flask import Flask, request
+from flask import Flask, request, g
 from flask_cors import CORS
 from dotenv import load_dotenv
 
@@ -20,6 +21,17 @@ cors = CORS(app, supports_credentials=True,
             resources={r"/*": {"origins": ["https://7d7b-31-53-104-139.ngrok-free.app", "http://localhost:5173"]}})
 
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user_id = request.cookies.get('user_id')
+        if not user_id:
+            return {"error": "User not authenticated"}, 403
+        g.user_id = user_id
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @app.route('/')
 def home():
     return "Hello, Flask!"
@@ -33,12 +45,14 @@ def slack_oauth():
 @app.route('/whoami')
 def whoami():
     user = request.cookies.get('user_id')
-    print(user)
+    # print(user)
     return {"message": "success", "user": user}, 200
 
 
 @app.route('/slash', methods=['GET'])
+@login_required
 def slash_list():
+    print(g.user_id)
     return list_commands()
 
 
