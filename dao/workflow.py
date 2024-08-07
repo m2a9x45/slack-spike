@@ -1,6 +1,17 @@
 from dao import db
 
 
+def list_all_wf_steps_by_id(wf_id):
+    con = db.get_connection()
+    cursor = con.cursor(dictionary=True)
+
+    sql = "SELECT * FROM wf_steps WHERE wf_id = %s"
+    val = (wf_id, )
+    cursor.execute(sql, val)
+
+    return cursor.fetchall()
+
+
 def get_step_by_id(wf_id, step_id):
     con = db.get_connection()
     cursor = con.cursor(dictionary=True)

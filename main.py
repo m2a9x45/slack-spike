@@ -13,6 +13,7 @@ from slack.slash_command import handle_slash_command
 
 from routes.commands import *
 from routes.oauth_slack import *
+from routes.workflow import *
 
 load_dotenv()
 
@@ -35,6 +36,11 @@ def login_required(f):
 @app.route('/')
 def home():
     return "Hello, Flask!"
+
+
+@app.route('/wf', methods=['GET'])
+def workflow():
+    return read_workflow()
 
 
 @app.route('/oauth/slack', methods=['POST'])
