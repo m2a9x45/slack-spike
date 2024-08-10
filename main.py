@@ -43,6 +43,11 @@ def workflow():
     return read_workflow()
 
 
+@app.route('/wf/step/update', methods=['POST'])
+def updateWorkflowStep():
+    return update_workflow_step(request.json)
+
+
 @app.route('/oauth/slack', methods=['POST'])
 def slack_oauth():
     return handle_oauth_slack()

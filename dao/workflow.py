@@ -54,3 +54,27 @@ def get_model_options_by_step_id(step_id):
     cursor.execute(sql, val)
 
     return cursor.fetchall()
+
+
+def update_workflow_step(step_id, message):
+    con = db.get_connection()
+    cursor = con.cursor(dictionary=True)
+
+    sql = "UPDATE wf_steps SET message = %s WHERE step_id = %s"
+    val = (message, step_id)
+    cursor.execute(sql, val)
+    con.commit()
+
+    return cursor.rowcount
+
+
+def update_branch(id, next_step_id, message):
+    con = db.get_connection()
+    cursor = con.cursor(dictionary=True)
+
+    sql = "UPDATE wf_branches SET next_step_id=%s, text=%s WHERE id = %s"
+    val = (next_step_id, message, id)
+    cursor.execute(sql, val)
+    con.commit()
+
+    return cursor.rowcount
