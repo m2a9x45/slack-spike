@@ -45,6 +45,17 @@ def get_branches_by_action_id(action_id):
     return cursor.fetchall()
 
 
+def get_wf_id_by_action_id(action_id):
+    con = db.get_connection()
+    cursor = con.cursor(dictionary=True)
+
+    sql = "SELECT wf_id FROM wf_branches AS b INNER JOIN wf_steps AS s ON b.step_id=s.step_id WHERE action_id = %s"
+    val = (action_id, )
+    cursor.execute(sql, val)
+
+    return cursor.fetchone()
+
+
 def get_model_options_by_step_id(step_id):
     con = db.get_connection()
     cursor = con.cursor(dictionary=True)
@@ -74,6 +85,30 @@ def update_branch(id, next_step_id, message):
 
     sql = "UPDATE wf_branches SET next_step_id=%s, text=%s WHERE id = %s"
     val = (next_step_id, message, id)
+    cursor.execute(sql, val)
+    con.commit()
+
+    return cursor.rowcount
+
+
+def create_step(wf_id, step_id, action, message):
+    con = db.get_connection()
+    cursor = con.cursor(dictionary=True)
+
+    sql = "INSERT INTO wf_steps (wf_id, step_id, action, message) VALUES (%s, %s, %s, %s)"
+    val = (wf_id, step_id, action, message)
+    cursor.execute(sql, val)
+    con.commit()
+
+    return cursor.rowcount
+
+
+def create_branch(step_id, action_id, next_step_id, text):
+    con = db.get_connection()
+    cursor = con.cursor(dictionary=True)
+
+    sql = "INSERT INTO wf_branches (step_id, action_id, next_step_id, text) VALUES (%s, %s, %s, %s)"
+    val = (step_id, action_id, next_step_id, text)
     cursor.execute(sql, val)
     con.commit()
 

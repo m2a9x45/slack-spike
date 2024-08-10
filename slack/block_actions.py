@@ -63,7 +63,7 @@ def get_thread(data):
 
 
 def block_action_v2(action_id, channel, thread_ts, trigger_id):
-    workflow_id = action_id.split("_")[0]
+    workflow_id = workflow.get_wf_id_by_action_id(action_id=action_id)["wf_id"]
     selected_branch = workflow.get_branches_by_action_id(action_id=action_id)
 
     print("WorkflowID:", workflow_id)
@@ -73,6 +73,10 @@ def block_action_v2(action_id, channel, thread_ts, trigger_id):
         wf_id=workflow_id, step_id=selected_branch[0]["next_step_id"])
 
     print("Next Step:", next_step)
+
+    if next_step == []:
+        print("Somthing went wrong, we've been unable to find the block actions next step")
+        return
 
     match next_step[0]["action"]:
         case "send_message":
@@ -146,7 +150,7 @@ def block_action_v2(action_id, channel, thread_ts, trigger_id):
             print(outcomes)
 
             slack_fallback_message(
-                channel=channel, thread_ts=thread_ts, elements=outcomes)
+                channel=channel, thread_ts=thread_ts, elements=outcomes, text=next_step[0]["message"])
         case _:
             print("unsupported next step action type")
             return

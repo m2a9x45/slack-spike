@@ -55,7 +55,7 @@ def slack_open_model(trigger_id, blocks, callback_id):
     })
 
 
-def slack_fallback_message(channel, thread_ts, elements):
+def slack_fallback_message(channel, thread_ts, elements, text):
     data = {
         "channel": channel,
         "blocks": [
@@ -63,7 +63,7 @@ def slack_fallback_message(channel, thread_ts, elements):
                 "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "Here is a button:"
+                            "text": text
                         }
             },
             {

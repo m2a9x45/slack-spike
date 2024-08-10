@@ -61,4 +61,4 @@ def handle_slash_command_v2(data):
     print(outcomes)
 
     slack_fallback_message(
-        channel="C074P84H15Y", thread_ts=None, elements=outcomes)
+        channel="C074P84H15Y", thread_ts=None, elements=outcomes, text=first_step[0]["message"])

@@ -38,14 +38,24 @@ def home():
     return "Hello, Flask!"
 
 
-@app.route('/wf', methods=['GET'])
-def workflow():
-    return read_workflow()
+@app.route('/wf/<wf_id>', methods=['GET'])
+def workflow(wf_id):
+    return read_workflow(wf_id)
 
 
 @app.route('/wf/step/update', methods=['POST'])
 def updateWorkflowStep():
     return update_workflow_step(request.json)
+
+
+@app.route('/wf/step/create', methods=['POST'])
+def createWorkflowStep():
+    return create_workflow_step(request.json)
+
+
+@app.route('/wf/step/branch/create', methods=['POST'])
+def createWorkflowBranch():
+    return create_workflow_branch(request.json)
 
 
 @app.route('/oauth/slack', methods=['POST'])
