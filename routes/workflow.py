@@ -60,8 +60,8 @@ def create_workflow_branch(data):
     return "", 200
 
 
-def read_workflow_step_location(step_id):
-    locations = workflow.read_step_locations(step_id=step_id)
+def read_workflow_step_location(wf_id):
+    locations = workflow.list_step_locations_by_wf_id(wf_id=wf_id)
     return locations, 200
 
 
