@@ -61,9 +61,7 @@ def create_workflow_branch(data):
 
 
 def read_workflow_step_location(step_id):
-    print(step_id)
     locations = workflow.read_step_locations(step_id=step_id)
-    print("hi", locations)
     return locations, 200
 
 
@@ -72,7 +70,6 @@ def save_workflow_step_location(data):
 
     for key in data["locations"]:
         step = data["locations"][key]
-        print(key, step["left"], step["top"])
 
         location_for_step_id = workflow.read_step_locations(step_id=key)
         if len(location_for_step_id) != 0:
