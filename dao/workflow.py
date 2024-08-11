@@ -131,7 +131,7 @@ def read_step_locations(step_id):
     con = db.get_connection()
     cursor = con.cursor(dictionary=True)
 
-    sql = "SELECT * FROM wf_steps_position WHERE wf_id = %s"
+    sql = "SELECT * FROM wf_steps_position WHERE step_id = %s"
     val = (step_id, )
     cursor.execute(sql, val)
 
