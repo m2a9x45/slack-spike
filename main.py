@@ -58,6 +58,16 @@ def createWorkflowBranch():
     return create_workflow_branch(request.json)
 
 
+@app.route('/wf/step/location/<wf_id>', methods=['GET'])
+def readWorkflowStepLocation(wf_id):
+    return read_workflow_step_location(wf_id)
+
+
+@app.route('/wf/step/location', methods=['POST'])
+def saveWorkflowStepLocation():
+    return save_workflow_step_location(request.json)
+
+
 @app.route('/oauth/slack', methods=['POST'])
 def slack_oauth():
     return handle_oauth_slack()

@@ -34,6 +34,15 @@ CREATE TABLE IF NOT EXISTS `wf_steps` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
+CREATE TABLE IF NOT EXISTS `wf_steps_position` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `wf_id` varchar(45) DEFAULT NULL,
+  `step_id` varchar(45) DEFAULT NULL,
+  `left` int(11) DEFAULT NULL,
+  `top` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
 CREATE TABLE IF NOT EXISTS `wf_branches` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `step_id` varchar(45) DEFAULT NULL,

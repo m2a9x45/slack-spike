@@ -103,6 +103,52 @@ def create_step(wf_id, step_id, action, message):
     return cursor.rowcount
 
 
+def create_step_location(wf_id, step_id, left, top):
+    con = db.get_connection()
+    cursor = con.cursor(dictionary=True)
+
+    sql = "INSERT INTO wf_steps_position (wf_id, step_id, `left`, top) VALUES (%s, %s, %s, %s)"
+    val = (wf_id, step_id, left, top)
+    cursor.execute(sql, val)
+    con.commit()
+
+    return cursor.rowcount
+
+
+def update_step_location(step_id, left, top):
+    con = db.get_connection()
+    cursor = con.cursor(dictionary=True)
+
+    sql = "UPDATE wf_steps_position SET `left`=%s, top=%s WHERE step_id=%s"
+    val = (left, top, step_id)
+    cursor.execute(sql, val)
+    con.commit()
+
+    return cursor.rowcount
+
+
+def read_step_locations(step_id):
+    con = db.get_connection()
+    cursor = con.cursor(dictionary=True)
+
+    sql = "SELECT * FROM wf_steps_position WHERE wf_id = %s"
+    val = (step_id, )
+    cursor.execute(sql, val)
+
+    return cursor.fetchall()
+
+
+def list_step_locations_by_wf_id(wf_id):
+    con = db.get_connection()
+    cursor = con.cursor(dictionary=True)
+
+    sql = "SELECT * FROM wf_steps_position WHERE wf_id = %s"
+    val = (wf_id, )
+    cursor.execute(sql, val)
+
+    return cursor.fetchall()
+
+
 def create_branch(step_id, action_id, next_step_id, text):
     con = db.get_connection()
     cursor = con.cursor(dictionary=True)

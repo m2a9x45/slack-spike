@@ -58,3 +58,28 @@ def create_workflow_branch(data):
         uuid.uuid4()), next_step_id=data["next_step_id"], text=data["action"])
 
     return "", 200
+
+
+def read_workflow_step_location(step_id):
+    print(step_id)
+    locations = workflow.read_step_locations(step_id=step_id)
+    print("hi", locations)
+    return locations, 200
+
+
+def save_workflow_step_location(data):
+    wf_id = data["wf_id"]
+
+    for key in data["locations"]:
+        step = data["locations"][key]
+        print(key, step["left"], step["top"])
+
+        location_for_step_id = workflow.read_step_locations(step_id=key)
+        if len(location_for_step_id) != 0:
+            workflow.update_step_location(
+                step_id=key, left=step["left"], top=step["top"])
+        else:
+            workflow.create_step_location(
+                wf_id=wf_id, step_id=key, left=step["left"], top=step["top"])
+
+    return "", 200
